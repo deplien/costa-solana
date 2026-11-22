@@ -250,14 +250,19 @@ function swingLimbs(ped, dt, speed) {
 
 // makeBeacon(colorHex) -> { group, ring }: a pillar of light with a
 // bobbing ring at its base — gold for story goals, teal for races.
+// The pillar stays a soft shaft, never a blown-out column: normal
+// blending at low opacity, front faces only. (Additive blending
+// stacks the shaft's light onto an already bright golden-hour sky
+// and saturates to white no matter how low the opacity goes;
+// tinting toward the beacon colour keeps the shaft visibly gold.)
 function makeBeacon(colorHex) {
   const group = new THREE.Group();
   const pillar = new THREE.Mesh(
     new THREE.CylinderGeometry(1.7, 1.7, 26, 20, 1, true),
     new THREE.MeshBasicMaterial({
-      color: colorHex, transparent: true, opacity: 0.3,
-      blending: THREE.AdditiveBlending, depthWrite: false,
-      side: THREE.DoubleSide, fog: false,
+      color: colorHex, transparent: true, opacity: 0.38,
+      blending: THREE.NormalBlending, depthWrite: false,
+      side: THREE.FrontSide, fog: false,
     }),
   );
   pillar.position.y = 13;

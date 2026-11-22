@@ -101,15 +101,41 @@ function stageCover(G) {
   const start = G.world.playerStart;
   const car = nearestCar(G, start.x, start.z, ['sport']) || nearestCar(G, start.x, start.z);
   if (car) {
-    setCarPose(car, -16, 350, 0.35, 0);
+    setCarPose(car, -18.5, 352.5, 0.35, 0);
     recolorCarPaint(car, 0xff5a4e);
   }
   // Hero pose: the player at the driver's door, facing the lens, the
   // coral car beside them, the avenue and palms in the midground and
-  // the pastel skyline behind — the city is the backdrop.
-  setPlayerOnFoot(G, -13.6, 351.5, headingToward(-13.6, 351.5, -24, 366));
+  // the pastel skyline behind — the city is the backdrop. The camera
+  // sits low and close so car and driver fill the centre third, with
+  // the avenue running diagonally out of the frame.
+  setPlayerOnFoot(G, -16.2, 353.8, headingToward(-16.2, 353.8, -25.5, 358.8));
+  // Set dressing: two more cars rest on the avenue in the
+  // mid-background (parked, so nothing drifts) and two locals idle on
+  // the sidewalk behind the hero — a living beachfront, not a diorama.
+  const setCars = G.cars.filter((c) => c !== car && c.state === 'traffic').slice(0, 2);
+  const carSpots = [
+    { x: 34, z: 354.5, h: Math.PI / 2 },
+    { x: -72, z: 365.5, h: -Math.PI / 2 },
+  ];
+  setCars.forEach((c, i) => {
+    if (!carSpots[i]) return;
+    setCarPose(c, carSpots[i].x, carSpots[i].z, carSpots[i].h, 0);
+    c.state = 'parked';
+  });
+  const pedSpots = [
+    { x: -26, z: 347.5 },
+    { x: -22, z: 350 },
+  ];
+  G.peds.slice(0, pedSpots.length).forEach((ped, i) => {
+    if (!ped || !ped.mesh) return;
+    ped.mesh.position.set(pedSpots[i].x, 0, pedSpots[i].z);
+    ped.state = 'stand';
+    ped.heading = headingToward(pedSpots[i].x, pedSpots[i].z, -25.5, 358.8);
+    ped.mesh.rotation.y = ped.heading;
+  });
   G.wanted = 0;
-  setCamera(G, -24, 2.6, 366, -14, 1.4, 349);
+  setCamera(G, -25.5, 1.9, 358.8, -16.8, 1.15, 352.2);
 }
 
 function stageDrive(G) {
@@ -127,7 +153,10 @@ function stageDrive(G) {
     if (spots[i]) setCarPose(c, spots[i].x, spots[i].z, spots[i].h, 12);
   });
   G.cameraYaw = Math.PI / 2;
-  setCamera(G, 79, 4.5, -180, 100, 1.2, -180);
+  // Tight chase cam: nine metres behind the hero car (it runs +x at
+  // heading PI/2) and low, looking eight metres past its nose, so
+  // the car fills the lower frame against the downtown towers.
+  setCamera(G, 81, 3.2, -180, 98, 1, -180);
 }
 
 // The chase frame: five stars on the beachfront avenue, police in the
@@ -156,16 +185,14 @@ function stageChase(G) {
 
   // Dressing pass: wherever the simulation scattered them, the frame
   // needs the hero eastbound on the avenue with patrol cars in its
-  // mirrors — re-pose the hero, then line the nearest cops up behind.
+  // mirrors — re-pose the hero, then herd the nearest cops in close
+  // behind it, 13 + (i % 3) * 5 metres back, one per avenue lane.
   if (hero) putPlayerInCar(G, hero, 0, 360, Math.PI / 2, 30);
-  const dressSpots = [
-    { x: -11, z: 356.8 },
-    { x: -19, z: 363.5 },
-    { x: -28, z: 357.5 },
-  ];
-  G.cops.slice(0, dressSpots.length).forEach((cop, i) => {
+  const dressLanes = [356.8, 363.5, 357.5];
+  G.cops.slice(0, dressLanes.length).forEach((cop, i) => {
     if (!cop || !cop.mesh) return;
-    cop.mesh.position.set(dressSpots[i].x, 0, dressSpots[i].z);
+    const behind = 13 + (i % 3) * 5;
+    cop.mesh.position.set(-behind, 0, dressLanes[i]);
     cop.heading = Math.PI / 2;
     cop.mesh.rotation.y = Math.PI / 2;
     cop.speed = 28;
@@ -174,7 +201,7 @@ function stageChase(G) {
   // Helicopter: police.js keeps it as a record ({ mesh, angle }), so
   // pose the mesh — above the pursuit, rotor spun for the frame.
   if (G.heli && G.heli.mesh) {
-    G.heli.mesh.position.set(-14, 22, 352);
+    G.heli.mesh.position.set(-12, 13.5, 353);
     G.heli.mesh.rotation.y = Math.PI / 2;
     const rotor = G.heli.mesh.userData.rotor;
     if (rotor) rotor.rotation.y += 0.9;
@@ -198,8 +225,9 @@ function stageChase(G) {
   }
 
   // From the beach, looking back along the avenue: hero in front,
-  // patrol cars behind it, helicopter above them, skyline beyond.
-  setCamera(G, 30, 6.5, 338, -6, 1.2, 359);
+  // patrol cars close behind it, the helicopter fully inside the
+  // upper third of the frame, skyline beyond.
+  setCamera(G, 20, 5.5, 338, -2, 1.2, 359.5);
 }
 
 // The mission frame: the player meets Lucia at her beach kiosk,
@@ -247,9 +275,10 @@ function stageMission(G) {
   if (G.say) {
     G.say(['Lucia Ferrer: You came. Good — Solana rewards the bold.']);
   }
-  // From the sand, looking north past the meeting: Lucia, her beacon
-  // and the player against the avenue and the skyline, not the sea.
-  setCamera(G, -41, 3.0, 413, -50, 1.5, 396);
+  // From the sand, close in and low, looking north past the meeting:
+  // Lucia, her beacon and the player fill the centre against the
+  // avenue and the skyline, the kiosk held at the frame's edge.
+  setCamera(G, -46.5, 1.8, 403.5, -50.3, 1.15, 396.6);
 }
 
 // --- Entry point -----------------------------------------------------------
