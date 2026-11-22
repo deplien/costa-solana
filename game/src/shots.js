@@ -275,10 +275,11 @@ function stageMission(G) {
   if (G.say) {
     G.say(['Lucia Ferrer: You came. Good — Solana rewards the bold.']);
   }
-  // From the sand, close in and low, looking north past the meeting:
-  // Lucia, her beacon and the player fill the centre against the
-  // avenue and the skyline, the kiosk held at the frame's edge.
-  setCamera(G, -46.5, 1.8, 403.5, -50.3, 1.15, 396.6);
+  // From the sand, closer in and low, looking north past the
+  // meeting: Lucia, her beacon and the player sit large in the
+  // centre against the avenue and the skyline, the kiosk held at
+  // the frame's edge and little empty sand below.
+  setCamera(G, -47.5, 1.7, 402.0, -50.3, 1.1, 396.6);
 }
 
 // --- Entry point -----------------------------------------------------------

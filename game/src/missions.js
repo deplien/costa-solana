@@ -249,7 +249,9 @@ function swingLimbs(ped, dt, speed) {
 }
 
 // makeBeacon(colorHex) -> { group, ring }: a pillar of light with a
-// bobbing ring at its base — gold for story goals, teal for races.
+// compact bobbing halo ring at head height — gold for story goals,
+// teal for races. The ring stays person-sized on purpose: a wide
+// flat torus reads as a floating bar from low camera angles.
 // The pillar stays a soft shaft, never a blown-out column: normal
 // blending at low opacity, front faces only. (Additive blending
 // stacks the shaft's light onto an already bright golden-hour sky
@@ -268,7 +270,7 @@ function makeBeacon(colorHex) {
   pillar.position.y = 13;
   group.add(pillar);
   const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(2.4, 0.14, 8, 28),
+    new THREE.TorusGeometry(0.55, 0.06, 8, 28),
     new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.9, fog: false }),
   );
   ring.rotation.x = Math.PI / 2;
