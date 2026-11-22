@@ -160,7 +160,8 @@ export function createHud(G) {
       districtEl.textContent = districtText;
     }
 
-    // Speedometer, only at the wheel.
+    // Speedometer, only at the wheel; the ×3.6 below reads the
+    // car's world-units-per-second as km/h.
     const speedoText = G.player.car
       ? `${Math.round(Math.abs(G.player.car.speed) * 3.6)} <small>KM/H</small>`
       : '';

@@ -53,6 +53,7 @@ export const CFG = {
     0x9b59b6, 0xff6b9d, 0xffffff, 0xecf0f1, 0x95a5a6, 0x2c3e50,
   ],
 
+  // Vegetation and street furniture.
   PALM_TRUNK: 0x8a6b4a,
   PALM_FROND: 0x2e8b3a,
   LAMP_POST: 0x3a4a42,

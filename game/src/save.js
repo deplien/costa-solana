@@ -4,6 +4,7 @@
 // localStorage can be unavailable (private windows, file quotas) and a
 // failed save must never break the game.
 
+// The storage key; the -v1 suffix versions the record's shape.
 export const SAVE_KEY = 'costa-solana-save-v1';
 
 // Writes the current run's progress. Called by main.js on an autosave

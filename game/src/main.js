@@ -210,6 +210,7 @@ function respawn() {
 // lock: movement accumulates into mouseDX/mouseDY, which the frame
 // loop zeroes after every frame.
 
+// Keys the page would otherwise scroll or button-activate on.
 const PREVENTED_CODES = new Set([
   'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
 ]);

@@ -7,7 +7,7 @@
 // inside the browser's autoplay rules. Every public function guards
 // against a missing context, so callers never need to check.
 
-const STATION_COUNT = 3;
+const STATION_COUNT = 3; // matches the stations array built in createAudio
 
 // Chord helpers: frequencies for the notes the stations use.
 function noteFreq(midi) {

@@ -153,7 +153,7 @@ export function spawnPeds(G, count) {
 /* ------------------------------------------------------------------ */
 
 const FLEE_RADIUS = 26; // how close danger has to be to spook a ped
-const FLEE_SPEED = 4.5;
+const FLEE_SPEED = 4.5; // panic sprint — over twice the fastest stroll
 const DOWN_SECONDS = 4; // time spent on the pavement before rising
 
 // animateWalk(ped, dt, speed): swing the limbs and bob the body in

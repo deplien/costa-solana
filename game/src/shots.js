@@ -65,6 +65,7 @@ function nearestCar(G, x, z, kinds) {
 
 // --- The stagings --------------------------------------------------------
 
+// The title frame: title mode over a dressed beachfront vista.
 function stageTitle(G) {
   G.mode = 'title';
   // Dress the beachfront avenue with a few cruising cars so the title

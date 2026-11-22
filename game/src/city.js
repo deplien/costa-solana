@@ -433,7 +433,8 @@ function palmGeometry() {
   return mergeGeometries([trunk, crown]);
 }
 
-// collidesAt(colliders, x, z, pad): is a point inside any building?
+// collidesAt(colliders, x, z, pad): is a point inside any collider,
+// grown by pad on every side? Keeps palms and spawns out of buildings.
 function collidesAt(colliders, x, z, pad) {
   return colliders.some((c) => Math.abs(x - c.x) < c.hw + pad && Math.abs(z - c.z) < c.hd + pad);
 }

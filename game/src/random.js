@@ -8,6 +8,7 @@
 // makeRng(seed) -> rng() returning floats in [0, 1).
 // mulberry32: a tiny, fast, well-distributed 32-bit generator.
 export function makeRng(seed) {
+  // (>>> 0) normalises any seed to a uint32; the || 1 avoids a zero state.
   let state = (seed >>> 0) || 1;
   return function rng() {
     state = (state + 0x6d2b79f5) | 0;

@@ -20,7 +20,7 @@ export const WEAPONS = [
   { id: 'smg', name: 'Solana SMG', damage: 20, range: 75, cooldown: 0.09, auto: true, ammoKey: 'smg' },
 ];
 
-const START_AMMO = { pistol: 60, smg: 160 };
+const START_AMMO = { pistol: 60, smg: 160 }; // rounds per pool at a fresh start
 const TRACER_COUNT = 6; // pooled tracer lines, recycled per shot
 
 // initWeapons(G): set up the player's weapon state — selection,

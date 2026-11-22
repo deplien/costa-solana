@@ -1,7 +1,8 @@
 // minimap.js — the corner map: a player-centred, north-up view of
 // Costa Solana with the street grid, the shoreline, and every blip
 // the game is tracking — gold for the story, teal for race rings,
-// orange for taxi fares, blue for the law.
+// orange for taxi fares, magenta for the race rival, red for
+// hostiles, blue for the law.
 //
 // One job: draw the map. createMinimap grabs the #minimap canvas
 // from index.html; update() redraws every other frame, clipped to a

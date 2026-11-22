@@ -18,7 +18,7 @@ import { makePedMesh } from './pedestrians.js';
 
 export const POINTS_PER_STAR = 40;
 const COPS_BY_STARS = [0, 1, 2, 3, 4, 6]; // patrol cars wanted at 0..5 stars
-const COP_MAX_SPEED = 40;
+const COP_MAX_SPEED = 40; // patrol top speed in a chase
 const COP_MAX_SPEED_HOT = 43.5; // four stars and up, they stop playing
 const SPAWN_MIN_DIST = 115; // patrols arrive from off-screen
 const SPAWN_MAX_DIST = 185;

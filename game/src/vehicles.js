@@ -237,6 +237,7 @@ function ensureSmoke(car) {
 /* Spawning: traffic that drives, and parked cars that wait.           */
 /* ------------------------------------------------------------------ */
 
+// The five body styles civilian traffic and parked cars are drawn from.
 const CAR_KIND_NAMES = ['sedan', 'hatch', 'pickup', 'van', 'sport'];
 
 // laneFromSpawn(spawn) -> { axis, line, dir } describing which road a

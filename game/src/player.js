@@ -11,7 +11,7 @@ import { CFG } from './config.js';
 import { collideCircle, driveCar, steerToward, forwardOf, rightOf, dist2D } from './vehicles.js';
 import { makePedMesh } from './pedestrians.js';
 
-const WALK_SPEED = 5.2;
+const WALK_SPEED = 5.2; // on-foot pace, world units per second
 const SPRINT_MULT = 1.9;
 const ENTER_RANGE = 3.2; // how close a door must be to use it
 

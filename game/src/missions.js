@@ -301,6 +301,8 @@ function makeCheckpointRing() {
 // checkpoint ring and Lucia herself, then drives story, races and
 // taxi fares one frame at a time.
 export function createMissionSystem(G) {
+  // Story progress can arrive pre-set from a save (see save.js), so
+  // whatever is already on G is kept rather than reset.
   G.storyIndex = G.storyIndex || 0;
   G.storyDone = !!G.storyDone;
   G.endingReady = !!G.endingReady;

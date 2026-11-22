@@ -25,6 +25,7 @@ Costa Solana is an original sun-soaked 3D open-world crime game that runs from p
 - **Shift** — sprint (on foot)
 - **Mouse** — look / aim; **click** — punch or shoot
 - **F** — enter or exit a car (walk up to one to carjack it)
+- **Space** — handbrake while driving
 - **1 / 2 / 3** or **Q** — fists, pistol, SMG
 - **N** — next radio station while driving
 - **P / Esc** — pause
