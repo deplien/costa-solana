@@ -39,9 +39,12 @@ function canvasTexture(canvas, repeatX, repeatY) {
 
 // The shared window-grid facade. Buildings tint it with their material
 // colour, so one texture serves every pastel block in the city. A few
-// windows are warm-lit, most are glassy blue-grey.
+// windows are warm-lit, most are glassy blue-grey. The painted canvas
+// must be wrapped in a real THREE texture before it can ride a
+// material — a raw canvas has no uv transform matrix and the renderer
+// throws the moment a building scrolls into view.
 function facadeTexture() {
-  return makeCanvas(128, 256, (ctx, w, h) => {
+  return canvasTexture(makeCanvas(128, 256, (ctx, w, h) => {
     ctx.fillStyle = '#f7f1e3';
     ctx.fillRect(0, 0, w, h);
     for (let row = 0; row < 12; row++) {
@@ -53,13 +56,14 @@ function facadeTexture() {
     }
     ctx.fillStyle = 'rgba(0,0,0,0.08)';
     ctx.fillRect(0, h - 6, w, 6);
-  });
+  }), 1, 1);
 }
 
 // Hotel variant of the facade: horizontal balcony bands with railings,
-// for the Playa Dorada beachfront.
+// for the Playa Dorada beachfront. Wrapped in a texture for the same
+// reason as the facade above.
 function hotelTexture() {
-  return makeCanvas(128, 256, (ctx, w, h) => {
+  return canvasTexture(makeCanvas(128, 256, (ctx, w, h) => {
     ctx.fillStyle = '#faf3e6';
     ctx.fillRect(0, 0, w, h);
     for (let band = 0; band < 8; band++) {
@@ -71,7 +75,7 @@ function hotelTexture() {
       ctx.fillStyle = 'rgba(0,0,0,0.18)';
       ctx.fillRect(0, y + 20, w, 3);
     }
-  });
+  }), 1, 1);
 }
 
 // One 26-unit road segment: asphalt with speckle and a dashed centre
@@ -583,11 +587,13 @@ function buildLighthouse(group) {
 
 // buildVolcano(group): the island's namesake silhouette on the
 // south-east horizon, plus a smaller green islet to the south-west.
+// Kept low, far and warm-toned: it should read as a hazy landmark on
+// the horizon, never as a black mass swallowing the sky.
 function buildVolcano(group) {
   const parts = [
-    paintGeometry(placeGeometry(new THREE.ConeGeometry(360, 330, 7), 1150, 155, 1450), 0x5a4a52),
-    paintGeometry(placeGeometry(new THREE.CylinderGeometry(48, 62, 16, 9), 1150, 318, 1450), 0x3e3238),
-    paintGeometry(placeGeometry(new THREE.ConeGeometry(150, 95, 7), -1000, 40, 1250), 0x6b7a5e),
+    paintGeometry(placeGeometry(new THREE.ConeGeometry(230, 190, 7), 1500, 88, 1750), 0x7a6a5e),
+    paintGeometry(placeGeometry(new THREE.CylinderGeometry(34, 44, 12, 9), 1500, 182, 1750), 0x5d4c42),
+    paintGeometry(placeGeometry(new THREE.ConeGeometry(110, 58, 7), -1250, 24, 1500), 0x7d8a68),
   ];
   group.add(new THREE.Mesh(mergeGeometries(parts), vertexMat));
 }

@@ -26,6 +26,7 @@ const shotName = params.get('shot');
 
 // --- DOM handles -----------------------------------------------------------
 const containerEl = document.getElementById('game');
+const hudEl = document.getElementById('hud');
 const titleScreenEl = document.getElementById('title-screen');
 const pauseScreenEl = document.getElementById('pause-screen');
 const endScreenEl = document.getElementById('end-screen');
@@ -60,7 +61,7 @@ function boot() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
-    62, window.innerWidth / window.innerHeight, 0.1, 3000
+    62, window.innerWidth / window.innerHeight, 0.1, 6000
   );
   const rng = makeRng(Number.isFinite(seedParam) ? seedParam : 1);
 
@@ -129,7 +130,15 @@ function boot() {
   audioSys = createAudio(G);
   G.audio = audioSys;
   missions = createMissionSystem(G);
-  if (shotName) applyShot(G, shotName);
+  if (shotName) {
+    applyShot(G, shotName);
+    // A staged frame must show the game the staging posed, not the
+    // title card that covers a fresh page: match the overlays to the
+    // mode the staging chose (every dossier shot plays, one idles on
+    // the title vista).
+    if (G.mode !== 'title') titleScreenEl.classList.add('hidden');
+    if (G.mode === 'play' && hudEl) hudEl.classList.remove('hidden');
+  }
 
   attachSurfaceInput(renderer.domElement);
   prevMode = G.mode;

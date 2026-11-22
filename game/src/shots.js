@@ -81,17 +81,35 @@ function stageTitle(G) {
   setCamera(G, -120, 26, 470, 60, 10, 180);
 }
 
+// recolorCarPaint(car, hex): repaint only the car's paint. The body
+// shell is the first mesh makeCarMesh adds and its material belongs
+// to this car alone; clone it onto every mesh that shares it, so the
+// glass, trim and lights keep their own materials.
+function recolorCarPaint(car, hex) {
+  const body = car.mesh.children[0];
+  if (!body || !body.material || !body.material.color) return;
+  const original = body.material;
+  const paint = original.clone();
+  paint.color.setHex(hex);
+  car.mesh.traverse((child) => {
+    if (child.material === original) child.material = paint;
+  });
+}
+
 function stageCover(G) {
   G.mode = 'play';
   const start = G.world.playerStart;
   const car = nearestCar(G, start.x, start.z, ['sport']) || nearestCar(G, start.x, start.z);
-  if (car) setCarPose(car, -38, 330, 0.5, 0);
-  // Hero pose: the player beside the driver door, facing the lens,
-  // with the car, the arch and the golden skyline behind.
-  const camX = -30, camZ = 318;
-  setPlayerOnFoot(G, -35.4, 331.5, headingToward(-35.4, 331.5, camX, camZ));
+  if (car) {
+    setCarPose(car, -16, 350, 0.35, 0);
+    recolorCarPaint(car, 0xff5a4e);
+  }
+  // Hero pose: the player at the driver's door, facing the lens, the
+  // coral car beside them, the avenue and palms in the midground and
+  // the pastel skyline behind — the city is the backdrop.
+  setPlayerOnFoot(G, -13.6, 351.5, headingToward(-13.6, 351.5, -24, 366));
   G.wanted = 0;
-  setCamera(G, camX, 2.2, camZ, -35.4, 1.3, 331.5);
+  setCamera(G, -24, 2.6, 366, -14, 1.4, 349);
 }
 
 function stageDrive(G) {
@@ -121,38 +139,45 @@ function stageChase(G) {
   G.cameraYaw = Math.PI / 2;
 
   // 200 points = exactly five stars. Stepping the real police system
-  // spawns genuine pursuit cars and the helicopter; after each step we
-  // herd any cop that spawned ahead of the player back behind, so the
-  // frame reads as a chase, not an ambush.
+  // spawns genuine pursuit cars and the helicopter. The stepping is
+  // defensive: one bad step must never abort the staging, and two in
+  // a row end the loop — the dressing pass below poses the frame
+  // either way, and the camera is always set at the end.
   addWanted(G, 200);
-  const fwdX = Math.sin(Math.PI / 2);
-  const fwdZ = Math.cos(Math.PI / 2);
-  for (let step = 0; step < 40; step++) {
-    updatePolice(G, 0.1);
-    for (const cop of G.cops) {
-      if (!cop || !cop.mesh) continue;
-      const relX = cop.mesh.position.x - 0;
-      const relZ = cop.mesh.position.z - 360;
-      const ahead = relX * fwdX + relZ * fwdZ;
-      if (ahead > 4) {
-        const back = 22 + (step % 3) * 7;
-        const side = (step % 2 === 0 ? -1 : 1) * 4.5;
-        cop.mesh.position.set(0 - fwdX * back + fwdZ * side, 0, 360 - fwdZ * back - fwdX * side);
-        cop.heading = Math.PI / 2;
-        cop.mesh.rotation.y = Math.PI / 2;
-      }
+  let failures = 0;
+  for (let step = 0; step < 40 && failures < 2; step++) {
+    try {
+      updatePolice(G, 0.1);
+    } catch (err) {
+      failures++;
     }
     if (G.cops.length >= 2 && G.heli) break;
   }
 
-  // Helicopter: park it above and behind the hero car, rotor spun.
-  if (G.heli) {
-    G.heli.position.set(10, 26, 344);
-    G.heli.rotation.y = Math.PI / 2;
-    G.heli.traverse((child) => {
-      const p = child.geometry && child.geometry.parameters;
-      if (p && p.width >= 3 && p.height <= 0.35) child.rotation.y += 0.9;
-    });
+  // Dressing pass: wherever the simulation scattered them, the frame
+  // needs the hero eastbound on the avenue with patrol cars in its
+  // mirrors — re-pose the hero, then line the nearest cops up behind.
+  if (hero) putPlayerInCar(G, hero, 0, 360, Math.PI / 2, 30);
+  const dressSpots = [
+    { x: -11, z: 356.8 },
+    { x: -19, z: 363.5 },
+    { x: -28, z: 357.5 },
+  ];
+  G.cops.slice(0, dressSpots.length).forEach((cop, i) => {
+    if (!cop || !cop.mesh) return;
+    cop.mesh.position.set(dressSpots[i].x, 0, dressSpots[i].z);
+    cop.heading = Math.PI / 2;
+    cop.mesh.rotation.y = Math.PI / 2;
+    cop.speed = 28;
+  });
+
+  // Helicopter: police.js keeps it as a record ({ mesh, angle }), so
+  // pose the mesh — above the pursuit, rotor spun for the frame.
+  if (G.heli && G.heli.mesh) {
+    G.heli.mesh.position.set(-14, 22, 352);
+    G.heli.mesh.rotation.y = Math.PI / 2;
+    const rotor = G.heli.mesh.userData.rotor;
+    if (rotor) rotor.rotation.y += 0.9;
   }
 
   // If the police system did not raise a blockade of its own, dress
@@ -172,20 +197,59 @@ function stageChase(G) {
     G.scene.add(propB);
   }
 
-  setCamera(G, -13, 5.2, 349, 26, 1.5, 362);
+  // From the beach, looking back along the avenue: hero in front,
+  // patrol cars behind it, helicopter above them, skyline beyond.
+  setCamera(G, 30, 6.5, 338, -6, 1.2, 359);
 }
 
-// The mission frame: the player meets Lucia at her beachfront kiosk,
+// The mission frame: the player meets Lucia at her beach kiosk,
 // story mission 1 about to begin, objective and subtitle on screen.
+// In shot mode the mission system never ticks, so the staging does
+// updateIdle's placement itself: Lucia (found by her hot-pink shirt;
+// she is not one of G.peds) and her gold beacon (found by its gold
+// pillar) are moved to the first story marker, her beach kiosk at
+// (-60, 398), and the objective line is published for the HUD.
 function stageMission(G) {
   G.mode = 'play';
   G.storyIndex = 0;
-  const start = G.world.playerStart; // Lucia waits at (-45, 340)
-  setPlayerOnFoot(G, -52, 333, headingToward(-52, 333, start.x, start.z));
+  // The true marker is (-60, 398), but a beach kiosk stands at
+  // (-60, 402) and hides Lucia completely from any southern camera,
+  // so the meeting is staged a few steps east of the kiosk — close
+  // enough that the kiosk still dresses the frame's edge.
+  const place = { x: -51, z: 397 };
+  const pedMeshes = new Set(G.peds.map((p) => p.mesh));
+  let lucia = null;
+  let beacon = null;
+  G.scene.traverse((obj) => {
+    if (!lucia && !pedMeshes.has(obj) && obj.userData && obj.userData.torso
+        && obj.userData.torso.material && obj.userData.torso.material.color
+        && obj.userData.torso.material.color.getHex() === 0xff2e88) {
+      lucia = obj;
+    }
+    if (!beacon && obj.geometry && obj.geometry.type === 'CylinderGeometry'
+        && obj.material && obj.material.color
+        && obj.material.color.getHex() === 0xf7c948) {
+      beacon = obj.parent;
+    }
+  });
+  if (lucia) {
+    lucia.visible = true;
+    lucia.position.set(place.x, 0, place.z);
+    lucia.rotation.y = headingToward(place.x, place.z, -47, 391);
+  }
+  if (beacon) {
+    beacon.visible = true;
+    beacon.position.set(place.x, 0, place.z);
+  }
+  G.missionMarker = { x: place.x, z: place.z, kind: 'story' };
+  G.objectiveText = 'Meet Lucia Ferrer — "First Wheels"';
+  setPlayerOnFoot(G, -47, 391, headingToward(-47, 391, place.x, place.z));
   if (G.say) {
     G.say(['Lucia Ferrer: You came. Good — Solana rewards the bold.']);
   }
-  setCamera(G, -58, 3.2, 322, -48.5, 1.2, 336.5);
+  // From the sand, looking north past the meeting: Lucia, her beacon
+  // and the player against the avenue and the skyline, not the sea.
+  setCamera(G, -41, 3.0, 413, -50, 1.5, 396);
 }
 
 // --- Entry point -----------------------------------------------------------
